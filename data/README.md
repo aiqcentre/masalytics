@@ -1,4 +1,4 @@
-# Numero Data SQLite Database Schema
+# SQLite Database Schema
 
 ## Database Overview
 
@@ -33,8 +33,8 @@ erDiagram
         TEXT raw_json
     }
     
-    film_metadata ||--|| sales_raw_data : "numero_film_id"
-    indian_titles ||--o{ film_metadata : "title"
+    film_metadata o|--|| sales_raw_data : "numero_film_id"
+    indian_titles ||--|{ film_metadata : "title"
 ```
 
 ### Relationship Notes
