@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import plotly.graph_objects as go
 import sqlite3
 import json
 from pathlib import Path
@@ -246,7 +247,7 @@ plt.title("Key Cinemas: Stability vs Volatility (Log scale improves readability)
 plt.legend()
 plt.grid(True, alpha=0.3, which='both')
 plt.tight_layout()
-plt.savefig('outputs/q1_cinemas_scatter.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q1_cinemas_scatter.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: cities scatter plot
@@ -277,7 +278,7 @@ plt.title("Key Cities: Stability vs Volatility (Filtered, MIN_WEEKS applied)")
 plt.legend()
 plt.grid(True, alpha=0.3, which='both')
 plt.tight_layout()
-plt.savefig('outputs/q1_cities_scatter.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q1_cities_scatter.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: safer cinemas bar chart
@@ -296,7 +297,7 @@ plt.barh(safer_cinemas_ranked_plot['label'], safer_cinemas_ranked_plot['risk_adj
 plt.xlabel("Risk-adjusted score (mean / (1 + CV))")
 plt.title("Top 10 Safer Cinemas (Ranked)")
 plt.tight_layout()
-plt.savefig('outputs/q1_safer_cinemas_barh.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q1_safer_cinemas_barh.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: higher-risk cinemas bar chart
@@ -315,7 +316,7 @@ plt.barh(risk_cinemas_ranked_plot['label'], risk_cinemas_ranked_plot['mean_weekl
 plt.xlabel("Average weekly gross ($)")
 plt.title("Top 10 Higher-risk Cinemas (Ranked by Upside)")
 plt.tight_layout()
-plt.savefig('outputs/q1_higher_risk_cinemas_barh.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q1_higher_risk_cinemas_barh.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: safer cities bar chart
@@ -334,7 +335,7 @@ plt.barh(safer_cities_ranked_plot['label'], safer_cities_ranked_plot['risk_adjus
 plt.xlabel("Risk-adjusted score (mean / (1 + CV))")
 plt.title("Top 10 Safer Cities (Ranked)")
 plt.tight_layout()
-plt.savefig('outputs/q1_safer_cities_barh.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q1_safer_cities_barh.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: higher-risk cities bar chart
@@ -353,7 +354,7 @@ plt.barh(risk_cities_ranked_plot['label'], risk_cities_ranked_plot['mean_weekly_
 plt.xlabel("Average weekly gross ($)")
 plt.title("Top 10 Higher-risk Cities (Ranked by Upside)")
 plt.tight_layout()
-plt.savefig('outputs/q1_higher_risk_cities_barh.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q1_higher_risk_cities_barh.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: volatility heatmap for top cinemas
@@ -403,7 +404,7 @@ plt.xlabel("Week start")
 plt.ylabel("Cinema")
 
 plt.tight_layout()
-plt.savefig('outputs/q1_volatility_heatmap.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q1_volatility_heatmap.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 print("\nQ1 visualizations saved to outputs/:")
@@ -763,6 +764,40 @@ cinema_speed_plot = cinema_speed.merge(
 print(f"\nCity speed plot shape: {city_speed_plot.shape}")
 print(f"Cinema speed plot shape: {cinema_speed_plot.shape}")
 
+# Print market value breakdown by timing type
+print("\n" + "="*80)
+print("Q2 MARKET VALUE ANALYSIS")
+print("="*80)
+
+timing_breakdown = city_plot.groupby("timing_class")["total_gross"].agg(['sum', 'count', 'mean', 'median', 'min', 'max']).reset_index()
+total_market = city_plot['total_gross'].sum()
+
+print(f"\nTotal Market Value (Top 36 Cities): ${total_market:,.0f}")
+print(f"Average Revenue per City: ${total_market/len(city_plot):,.0f}\n")
+
+print(f'{"Timing Type":<20} {"Total Revenue":>18} {"# Cities":>10} {"Avg Revenue":>18} {"Median":>18}')
+print('-'*88)
+
+for _, row in timing_breakdown.iterrows():
+    timing_type = row['timing_class']
+    total = row['sum']
+    count = int(row['count'])
+    avg = row['mean']
+    median = row['median']
+    pct = 100 * total / total_market
+    print(f'{timing_type:<20} ${total:>17,.0f} {count:>10d} ${avg:>17,.0f} ${median:>17,.0f}')
+
+print('-'*88)
+print(f'\nMarket Share by Timing Type:')
+for _, row in timing_breakdown.iterrows():
+    timing_type = row['timing_class']
+    total = row['sum']
+    pct = 100 * total / total_market
+    count = int(row['count'])
+    print(f'  {timing_type:<18}: ${total:>17,.0f} ({pct:>5.1f}%)  [{count} cities]')
+
+print(f'\n  {"TOTAL":<18}: ${total_market:>17,.0f} (100.0%)  [{len(city_plot)} cities]')
+
 # ============== Q2 VISUALIZATIONS ==============
 
 # Create visualization: City timing map (bubble chart)
@@ -811,7 +846,7 @@ for _, r in city_plot.iterrows():
     )
 
 plt.tight_layout()
-plt.savefig('outputs/q2_cities_timing_map.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q2_cities_timing_map.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: Cinema timing map (bubble chart)
@@ -843,20 +878,26 @@ plt.ylabel("Total Gross (log scale)")
 plt.legend(loc="upper right")
 plt.grid(True, alpha=0.25)
 
-label_n = 10
-top_labels = cinema_plot.sort_values("total_gross", ascending=False).head(label_n)
-for _, r in top_labels.iterrows():
-    plt.text(
-        r["weighted_early_share"],
-        r["total_gross"],
-        f"{r['state']} | {r['theatre_name']}",
-        fontsize=9,
-        ha="left",
-        va="bottom"
+# Label top 3 cinemas per timing class
+top_per_class = 3
+for timing_type in ['EARLY_ADOPTER', 'BALANCED', 'SLOW_BURN']:
+    top_labels = (
+        cinema_plot[cinema_plot['timing_class'] == timing_type]
+        .sort_values("total_gross", ascending=False)
+        .head(top_per_class)
     )
+    for _, r in top_labels.iterrows():
+        plt.text(
+            r["weighted_early_share"],
+            r["total_gross"],
+            f"{r['state']} | {r['theatre_name']}",
+            fontsize=9,
+            ha="left",
+            va="bottom"
+        )
 
 plt.tight_layout()
-plt.savefig('outputs/q2_cinemas_timing_map.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q2_cinemas_timing_map.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: Cinema speed distribution (stacked bar chart)
@@ -895,7 +936,7 @@ plt.xlabel("Timing class")
 plt.title("Cinemas: Distribution of weeks_to_95 by timing class (counts)")
 plt.legend(title="weeks_to_95", bbox_to_anchor=(1.02, 1), loc="upper left")
 plt.tight_layout()
-plt.savefig('outputs/q2_cinemas_speed_distribution.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q2_cinemas_speed_distribution.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: City speed distribution (stacked bar chart)
@@ -925,14 +966,136 @@ for i, t in enumerate(totals):
 ax.legend(title="weeks_to_95", bbox_to_anchor=(1.02, 1), loc="upper left")
 plt.xticks(rotation=0)
 plt.tight_layout()
-plt.savefig('outputs/q2_cities_speed_distribution.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q2_cities_speed_distribution.png', dpi=100, bbox_inches='tight')
 plt.close()
+
+# Create visualization: Revenue comparison by timing type (Cities)
+# Merge timing classification with city-level aggregated revenue data
+city_timing_revenue = city_summary.merge(
+    city_plot[["state", "city", "timing_class"]],
+    on=["state", "city"],
+    how="left"
+).dropna(subset=['timing_class', 'total_gross'])
+
+fig = go.Figure()
+
+timing_colors = {
+    'EARLY_ADOPTER': 'rgb(31, 119, 180)',  # blue
+    'BALANCED': 'rgb(255, 127, 14)',       # orange
+    'SLOW_BURN': 'rgb(44, 160, 44)'        # green
+}
+
+for timing_type in ['EARLY_ADOPTER', 'BALANCED', 'SLOW_BURN']:
+    # Show total gross per city (aggregated across all films)
+    data = city_timing_revenue[city_timing_revenue['timing_class'] == timing_type]['total_gross']
+    
+    fig.add_trace(go.Box(
+        y=data,
+        name=timing_type,
+        marker_color=timing_colors[timing_type],
+        boxmean='sd',  # Show mean and standard deviation
+        hovertemplate='<b>%{fullData.name}</b><br>Total Gross: $%{y:,.0f}<extra></extra>'
+    ))
+
+fig.update_layout(
+    title='Revenue Distribution by Timing Type (Cities)',
+    yaxis_title='Total Gross (log scale)',
+    xaxis_title='Timing Type',
+    yaxis_type='log',
+    height=600,
+    width=1000,
+    showlegend=True,
+    hovermode='closest',
+    template='plotly_white'
+)
+
+fig.write_html('outputs_locationquestions/q2_cities_revenue_boxplot_interactive.html')
+print("Saved: outputs_locationquestions/q2_cities_revenue_boxplot_interactive.html")
+
+# Also save as static PNG for reports
+fig.write_image('outputs_locationquestions/q2_cities_revenue_boxplot.png', width=1000, height=600)
+print("Saved: outputs_locationquestions/q2_cities_revenue_boxplot.png")
+
+# Print revenue statistics by timing type
+print("\n" + "-"*80)
+print("Revenue Statistics by Timing Type (Cities)")
+print("-"*80)
+for timing_type in ['EARLY_ADOPTER', 'BALANCED', 'SLOW_BURN']:
+    data = city_timing_revenue[city_timing_revenue['timing_class'] == timing_type]['total_gross']
+    print(f"\n{timing_type}:")
+    print(f"  Count: {len(data)}")
+    print(f"  Mean: ${data.mean():,.0f}")
+    print(f"  Median: ${data.median():,.0f}")
+    print(f"  Std Dev: ${data.std():,.0f}")
+    print(f"  Min: ${data.min():,.0f}")
+    print(f"  Max: ${data.max():,.0f}")
+    print(f"  Q1 (25%): ${data.quantile(0.25):,.0f}")
+    print(f"  Q3 (75%): ${data.quantile(0.75):,.0f}")
+
+# Create visualization: Revenue comparison by timing type (Cinemas)
+# Merge timing classification with cinema-level aggregated revenue data
+cinema_timing_revenue = cinema_summary.merge(
+    cinema_plot[["state", "city", "theatre_name", "timing_class"]],
+    on=["state", "city", "theatre_name"],
+    how="left"
+).dropna(subset=['timing_class', 'total_gross'])
+
+fig = go.Figure()
+
+for timing_type in ['EARLY_ADOPTER', 'BALANCED', 'SLOW_BURN']:
+    # Show total gross per cinema (aggregated across all films)
+    data = cinema_timing_revenue[cinema_timing_revenue['timing_class'] == timing_type]['total_gross']
+    
+    fig.add_trace(go.Box(
+        y=data,
+        name=timing_type,
+        marker_color=timing_colors[timing_type],
+        boxmean='sd',  # Show mean and standard deviation
+        hovertemplate='<b>%{fullData.name}</b><br>Total Gross: $%{y:,.0f}<extra></extra>'
+    ))
+
+fig.update_layout(
+    title='Revenue Distribution by Timing Type (Cinemas)',
+    yaxis_title='Total Gross (log scale)',
+    xaxis_title='Timing Type',
+    yaxis_type='log',
+    height=600,
+    width=1000,
+    showlegend=True,
+    hovermode='closest',
+    template='plotly_white'
+)
+
+fig.write_html('outputs_locationquestions/q2_cinemas_revenue_boxplot_interactive.html')
+print("\nSaved: outputs_locationquestions/q2_cinemas_revenue_boxplot_interactive.html")
+
+# Also save as static PNG for reports
+fig.write_image('outputs_locationquestions/q2_cinemas_revenue_boxplot.png', width=1000, height=600)
+print("Saved: outputs_locationquestions/q2_cinemas_revenue_boxplot.png")
+
+# Print revenue statistics by timing type
+print("\n" + "-"*80)
+print("Revenue Statistics by Timing Type (Cinemas)")
+print("-"*80)
+for timing_type in ['EARLY_ADOPTER', 'BALANCED', 'SLOW_BURN']:
+    data = cinema_timing_revenue[cinema_timing_revenue['timing_class'] == timing_type]['total_gross']
+    print(f"\n{timing_type}:")
+    print(f"  Count: {len(data)}")
+    print(f"  Mean: ${data.mean():,.0f}")
+    print(f"  Median: ${data.median():,.0f}")
+    print(f"  Std Dev: ${data.std():,.0f}")
+    print(f"  Min: ${data.min():,.0f}")
+    print(f"  Max: ${data.max():,.0f}")
+    print(f"  Q1 (25%): ${data.quantile(0.25):,.0f}")
+    print(f"  Q3 (75%): ${data.quantile(0.75):,.0f}")
 
 print("\nQ2 visualizations saved to outputs/:")
 print("  - q2_cities_timing_map.png")
 print("  - q2_cinemas_timing_map.png")
 print("  - q2_cinemas_speed_distribution.png")
 print("  - q2_cities_speed_distribution.png")
+print("  - q2_cities_revenue_boxplot.png")
+print("  - q2_cinemas_revenue_boxplot.png")
 
 # ============== QUESTION 3: SEASONALITY BY CALENDAR WEEK ==============
 
@@ -1024,7 +1187,7 @@ axes[2].set_xlabel('ISO Week')
 axes[2].set_ylabel('State')
 
 plt.tight_layout()
-plt.savefig('outputs/q3_state_seasonality_heatmaps.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q3_state_seasonality_heatmaps.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 # Find peak and trough weeks per state
@@ -1054,7 +1217,7 @@ plt.title('State Seasonality Index by ISO Week (Top 4 States)')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig('outputs/q3_state_seasonality_lines.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q3_state_seasonality_lines.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 # City-level seasonality
@@ -1122,7 +1285,7 @@ plt.title('Key Cities × ISO Week: Seasonality Index (Red=Over-index, Blue=Under
 plt.xlabel('ISO Week')
 plt.ylabel('City')
 plt.tight_layout()
-plt.savefig('outputs/q3_city_seasonality_heatmap.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q3_city_seasonality_heatmap.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 # Bump chart: city ranks by week
@@ -1138,69 +1301,12 @@ for state, city in key_cities:
     plt.plot(city_data['iso_week'], city_data['avg_gross'], marker='o', label=f"{city[:15]}", alpha=0.7, linewidth=2)
 
 plt.xlabel('ISO Week')
-plt.ylabel('Average Gross ($)')
+plt.ylabel('Average Gross (in $10 Millions)')
 plt.title('Key Cities: Revenue Trend by ISO Week (Bumps Show Seasonal Variation)')
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=9)
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig('outputs/q3_city_revenue_trends.png', dpi=100, bbox_inches='tight')
-plt.close()
-
-# Opportunity quadrant: demand vs competition (state-week level)
-state_seasonality['titles_z'] = state_seasonality.groupby('state')['avg_titles'].transform(
-    lambda x: (x - x.mean()) / x.std() if x.std() > 0 else 0
-)
-
-state_seasonality['opportunity_score'] = (
-    state_seasonality['gross_z'] - 0.8 * state_seasonality['titles_z']
-)
-
-plt.figure(figsize=(14, 10))
-
-# Color by opportunity score
-scatter = plt.scatter(
-    state_seasonality['titles_z'],
-    state_seasonality['gross_z'],
-    s=100,
-    c=state_seasonality['opportunity_score'],
-    cmap='RdYlGn',
-    alpha=0.6,
-    edgecolors='black',
-    linewidth=0.5
-)
-
-# Add quadrant lines
-plt.axhline(0, linestyle='--', color='gray', alpha=0.5)
-plt.axvline(0, linestyle='--', color='gray', alpha=0.5)
-
-# Label best opportunities (upper-left quadrant)
-best_opps = state_seasonality[
-    (state_seasonality['gross_z'] > 0.5) & 
-    (state_seasonality['titles_z'] < 0)
-].nlargest(5, 'opportunity_score')
-
-for idx, row in best_opps.iterrows():
-    plt.annotate(
-        f"{row['state'][:8]} W{int(row['iso_week'])}",
-        (row['titles_z'], row['gross_z']),
-        fontsize=8,
-        alpha=0.7
-    )
-
-plt.colorbar(scatter, label='Opportunity Score')
-plt.xlabel('Competition (avg_titles, z-score) ← Less Crowded')
-plt.ylabel('Demand (avg_gross, z-score) → More Demand')
-plt.title('Opportunity Quadrant: State-Week Combinations (Upper-left = Best)')
-plt.grid(True, alpha=0.3)
-
-# Add quadrant labels
-plt.text(0.5, 0.95, 'High Demand\nHigh Competition', transform=plt.gca().transAxes, ha='center', va='top', fontsize=10, bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
-plt.text(-0.5, 0.95, 'High Demand\nLow Competition\n(BEST)', transform=plt.gca().transAxes, ha='center', va='top', fontsize=10, fontweight='bold', bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.7))
-plt.text(-0.5, -0.1, 'Low Demand\nLow Competition', transform=plt.gca().transAxes, ha='center', va='bottom', fontsize=10, bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.5))
-plt.text(0.5, -0.1, 'Low Demand\nHigh Competition\n(AVOID)', transform=plt.gca().transAxes, ha='center', va='bottom', fontsize=10, fontweight='bold', bbox=dict(boxstyle='round', facecolor='salmon', alpha=0.7))
-
-plt.tight_layout()
-plt.savefig('outputs/q3_opportunity_quadrant.png', dpi=100, bbox_inches='tight')
+plt.savefig('outputs_locationquestions/q3_city_revenue_trends.png', dpi=100, bbox_inches='tight')
 plt.close()
 
 print("\nQ3 visualizations saved to outputs/:")
@@ -1208,7 +1314,6 @@ print("  - q3_state_seasonality_heatmaps.png (3-panel heatmaps)")
 print("  - q3_state_seasonality_lines.png (seasonality index trends)")
 print("  - q3_city_seasonality_heatmap.png (key cities by week)")
 print("  - q3_city_revenue_trends.png (city revenue by week)")
-print("  - q3_opportunity_quadrant.png (demand vs competition)")
 
 # Summary statistics
 print("\n" + "="*80)

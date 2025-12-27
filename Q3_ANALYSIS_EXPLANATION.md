@@ -92,13 +92,6 @@ We want to know: for each state, city, and top cinema, which calendar weeks are 
 - **Key takeaway:**
   - Helps pick a "core rollout city set" vs "seasonal add-on city set."
 
-### Output 6 — Opportunity quadrant (demand vs competition)
-- **Y-axis:** demand (`gross_z`) — up is better
-- **X-axis:** competition (`titles_z`) — left is better
-- Best release windows are in the **upper-left quadrant** (high demand, low competition).
-- **Key takeaway:**
-  - Highlights state-week combinations where FilmViet can maximise demand without heavy title crowding.
-
 ---
 
 ## How this helps FilmViet (business actions)
@@ -148,13 +141,7 @@ We want to know: for each state, city, and top cinema, which calendar weeks are 
 - **Action:** Anchor releases in top-ranking, stable cities (e.g., always top-3); add seasonal cities as upside
 - **Metric:** city rank by week (bump chart), seasonality index per city per week
 
-### Perspective 5: Opportunity Cost View
-**Question:** Which weeks offer the best "bang for buck" (high demand, low competition)?
-- **Answer:** Upper-left quadrant of opportunity plot (Output 6) shows uncontested peak demand
-- **Action:** Target these golden weeks for FilmViet releases
-- **Metric:** opportunity_score = gross_z - 0.8 * titles_z
-
-### Perspective 6: Cinema-Level Deep Dive View
+### Perspective 5: Cinema-Level Deep Dive View
 **Question:** Which key cinemas (top performers) have distinct seasonality patterns?
 - **Answer:** Cinema-week aggregations show revenue by cinema and week
 - **Action:** In peak weeks, allocate more screens to over-indexing cinemas; reduce in troughs
