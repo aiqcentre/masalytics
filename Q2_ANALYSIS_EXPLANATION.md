@@ -1,10 +1,5 @@
 # Question 2 — Early Adopters vs Slow-burn: When Does the Audience Show Up?
 
-## Why this question matters
-Timing is everything. Some places rush out to see new Indian films in the first two weeks—these are your “early adopters.” Others take their time, with audiences building over several weeks. Knowing which is which helps FilmViet plan when and where to launch, how long to hold screens, and when to ramp up or ease off marketing.
-
----
-
 ## What we’re looking for
 We want to find out: which states, cities, and cinemas are “fast starters” and which are “slow burners”? This helps decide where to launch first and where to wait.
 
@@ -41,7 +36,7 @@ We want to find out: which states, cities, and cinemas are “fast starters” a
 
 ---
 
-## What each output represents (in order)
+## What each output represents 
 
 ### Output 1 — Timing Map (Cities): Early Share vs Total Gross
 - **Each dot = a city**
@@ -78,6 +73,33 @@ We want to find out: which states, cities, and cinemas are “fast starters” a
 - Helps FilmViet understand:
   - City-level market velocity
   - Which cities are "quick turnovers" vs "long-tail markets"
+
+### Output 5 — Revenue Distribution by Timing Type (Box Plot)
+- **Each box = a timing class** (EARLY_ADOPTER, BALANCED, SLOW_BURN)
+- **Y-axis:** `total_gross` (log scale) — revenue per cinema
+- **Box elements explain:**
+  - **Median (line in box):** The "typical" cinema revenue in that timing class
+  - **Box height (IQR):** Where 50% of cinemas fall (consistency of revenue)
+  - **Whiskers:** Full range of cinemas (best to worst performers)
+  - **Dots above/below:** Outliers (unusually high or low revenue)
+
+**Key insights:**
+- **EARLY_ADOPTER (Blue):** Highest revenue potential, widest range (some mega cinemas, some underperformers)
+  - Median: ~$300K–$500K
+  - Outliers reach $5M+ (premium locations)
+  - Action: Prioritize these locations for Wave 1
+  
+- **BALANCED (Orange):** Consistent, predictable revenue
+  - Median: ~$200K–$400K
+  - Stable box (reliable cinemas)
+  - Action: Standard rollout, can scale easily
+  
+- **SLOW_BURN (Green):** Broad spread of cinemas (mix of small and medium)
+  - Median: ~$200K–$300K
+  - Wide range: some small ($2K), some large ($1.5M)
+  - Action: Don't underestimate—includes valuable long-tail revenue
+
+**Business takeaway:** Don't ignore slow-burn cinemas. While they may be slower to convert, collectively they hold 30%+ of market revenue. The box plot shows you have high-value slow-burn locations worth including in your portfolio strategy.
 
 ---
 
