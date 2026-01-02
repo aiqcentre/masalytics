@@ -1,0 +1,61 @@
+state,city,theatre_name,total_gross,n_films,weighted_early_share,timing_class
+New South Wales (inc ACT),West and Blue Mountains,Blacktown 10,272329327.0,93.0,0.8641175652741947,SLOW_BURN
+Victoria (inc TAS),West Melbourne,Sunshine 20,209657591.0,98.0,0.8550791514150328,SLOW_BURN
+New South Wales (inc ACT),Parramatta & Ryde,Parramatta 11,186267643.0,90.0,0.9181478610324177,BALANCED
+Victoria (inc TAS),West Melbourne,Werribee 12,130169829.0,96.0,0.8765499108092091,SLOW_BURN
+Western Australia,Perth - South East,Carousel 14,127615348.0,69.0,0.9417609079434552,BALANCED
+Victoria (inc TAS),South East Melbourne,Chadstone 13,120889039.0,68.0,0.9371700357383104,BALANCED
+Queensland,Brisbane - South,Garden City Mt. Gravatt 16,116844278.0,96.0,0.9205666365622115,BALANCED
+Victoria (inc TAS),South East Melbourne,Fountain Gate 14,116149466.0,91.0,0.9142767216854876,BALANCED
+South Australia,Adelaide - West,Hoyts Arndale 8,100283467.0,89.0,0.9617181065349486,EARLY_ADOPTER
+Victoria (inc TAS),Central Inner Melbourne,Docklands 8,87936487.0,72.0,0.952228077976324,BALANCED
+Victoria (inc TAS),West Melbourne,Highpoint 18,86285900.0,62.0,0.9209410575771939,BALANCED
+Victoria (inc TAS),Outer East Melbourne,Knox 15,67312313.0,98.0,0.9157036989651507,BALANCED
+South Australia,Adelaide - North,Tea Tree Plaza 9,56436517.0,43.0,0.8942519255750669,SLOW_BURN
+New South Wales (inc ACT),Inner West,Burwood 12,54766017.0,63.0,0.886889893782124,SLOW_BURN
+Victoria (inc TAS),West Melbourne,Watergardens 8,46088639.0,50.0,0.9487243049203514,BALANCED
+Queensland,Brisbane - South,Sunnybank 8,45592760.0,66.0,0.953951745847367,EARLY_ADOPTER
+New South Wales (inc ACT),Hills & Hawkesbury,Castle Hill 15,45493947.0,57.0,0.8908273665505435,SLOW_BURN
+New South Wales (inc ACT),Canberra,Belconnen 10,44446624.0,56.0,0.9519601758729752,BALANCED
+New South Wales (inc ACT),South West Sydney,Liverpool 8,44249170.0,87.0,0.9176160366397833,BALANCED
+Queensland,Brisbane - North,Chermside 16,42832454.0,85.0,0.9640390205053393,EARLY_ADOPTER
+Victoria (inc TAS),North East Melbourne,Plenty Valley 9,42315223.0,73.0,0.9421332365423195,BALANCED
+Victoria (inc TAS),North West Melbourne,Broadmeadows 7,39314416.0,60.0,0.93267113518868,BALANCED
+Western Australia,Perth - North East,Morley 8,39177491.0,59.0,0.9068719842217563,BALANCED
+Victoria (inc TAS),North East Melbourne,Craigieburn United 8,38047098.0,64.0,0.878144451384965,SLOW_BURN
+South Australia,Adelaide - South,Marion 26,37635941.0,98.0,0.921943867432463,BALANCED
+Western Australia,Perth - North West,Innaloo 16,36616745.0,63.0,0.9581420740702102,EARLY_ADOPTER
+South Australia,Adelaide - North,Salisbury 8,34919570.0,55.0,0.938692601312101,BALANCED
+New South Wales (inc ACT),Canberra,Woden 8,31050765.0,51.0,0.9856853124230595,EARLY_ADOPTER
+Western Australia,Perth - North West,Karrinyup 10,30986469.0,33.0,0.8842232717771102,SLOW_BURN
+Victoria (inc TAS),South East Melbourne,M-City 6,28805085.0,54.0,0.8421936265766964,SLOW_BURN
+New South Wales (inc ACT),Sutherland & St George,Hurstville 7,27514496.0,29.0,0.89540717009681,BALANCED
+New South Wales (inc ACT),North Sydney - Hornsby,Hornsby 9,26925336.0,65.0,0.8597204877963268,SLOW_BURN
+New South Wales (inc ACT),South West Sydney,Wetherill Park 12,23242362.0,50.0,0.9417267487701981,BALANCED
+New South Wales (inc ACT),West and Blue Mountains,Mt. Druitt 8,23122193.0,54.0,0.9299455289556661,BALANCED
+Victoria (inc TAS),South East Melbourne,Dandenong 6,22332700.0,42.0,0.8344759030479969,SLOW_BURN
+Queensland,Ipswich Region,Springfield 8,21414389.0,61.0,0.9772841522585585,EARLY_ADOPTER
+Queensland,Brisbane - West,Indooroopilly 16,20481856.0,75.0,0.9400298976811476,BALANCED
+New South Wales (inc ACT),South West Sydney,Bankstown 8,20019335.0,49.0,0.9418362298248169,BALANCED
+New South Wales (inc ACT),South West Sydney,Ed Square 6,19802800.0,31.0,0.9555797159997577,EARLY_ADOPTER
+New South Wales (inc ACT),Parramatta & Ryde,Auburn 10,19435435.0,41.0,0.8561544930689743,SLOW_BURN
+Western Australia,Perth - North West,Hoyts Warwick 9,19376512.0,51.0,0.9140730798195258,BALANCED
+New South Wales (inc ACT),Newcastle and Lake Macquarie,Glendale 8,18354326.0,76.0,0.9545259793249831,EARLY_ADOPTER
+New South Wales (inc ACT),West and Blue Mountains,Penrith 10,17201735.0,47.0,0.9480337884521532,BALANCED
+Victoria (inc TAS),Hobart,Glenorchy 4,16980132.0,96.0,0.9533190319132973,BALANCED
+Victoria (inc TAS),North East Melbourne,Northland 14,16937937.0,36.0,0.9537857532472815,BALANCED
+Victoria (inc TAS),Central Inner Melbourne,Casino 13,15792205.0,54.0,0.8744639523106494,SLOW_BURN
+New South Wales (inc ACT),Parramatta & Ryde,Top Ryde 8,15584660.0,53.0,0.9248898596440346,BALANCED
+New South Wales (inc ACT),South West Sydney,Campbelltown 11,14861644.0,30.0,0.8510747532372597,SLOW_BURN
+Victoria (inc TAS),Outer East Melbourne,Forest Hill 6,13990931.0,32.0,0.8550099346498099,SLOW_BURN
+Victoria (inc TAS),Geelong,Geelong 11,13256314.0,86.0,0.9820167204850458,EARLY_ADOPTER
+Western Australia,Perth - South East,Southlands 8,12366562.0,37.0,0.9410785309611516,BALANCED
+Northern Territory,Darwin,Casuarina 7,12355613.0,64.0,0.9564613265242283,EARLY_ADOPTER
+Queensland,Brisbane - North,Stafford 10,11542774.0,35.0,0.9538648162044929,EARLY_ADOPTER
+New South Wales (inc ACT),Parramatta & Ryde,Macquarie 16,11447216.0,40.0,0.9847557694377392,EARLY_ADOPTER
+Victoria (inc TAS),Outer East Melbourne,Eastland 12,11255225.0,40.0,0.931596214202737,BALANCED
+Queensland,Gold Coast,Southport Australia Fair 10,10850714.0,47.0,0.9478042643092427,BALANCED
+Victoria (inc TAS),North West Melbourne,Airport West 8,10115398.0,81.0,0.9419558182485751,BALANCED
+Victoria (inc TAS),Central Inner Melbourne,Melbourne IMAX,9983484.0,9.0,1.0,EARLY_ADOPTER
+Victoria (inc TAS),Inner South Melbourne,Southland 16,9850911.0,50.0,0.9593468055898586,EARLY_ADOPTER
+Victoria (inc TAS),Mornington Peninsula,Frankston 12,9349456.0,32.0,0.9850127108999711,EARLY_ADOPTER
