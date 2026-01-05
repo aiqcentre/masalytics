@@ -26,13 +26,6 @@ We want to find out: which states, cities, and cinemas are “fast starters” a
 - **Screen planning**: Hold screens for a shorter time in fast markets, and longer in slow ones.
 - **Marketing**: Go big at launch in early adopter cities; spread out the spend in slow-burn places.
 - **Portfolio**: Don’t put all your eggs in one basket—balance quick wins with long-tail markets.
-     - Bottom 25% → **SLOW_BURN**
-
-5. **Validate timing using "weeks_to_95"**
-   - Build cumulative revenue share across rel_week per place.
-   - Compute:
-     - `weeks_to_95` = first rel_week where cumulative share ≥ 95%
-   - Early adopters should hit 95% faster; slow-burn should take longer.
 
 ---
 
