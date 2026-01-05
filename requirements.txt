@@ -1,0 +1,8 @@
+pandas>=1.5
+numpy>=1.23
+matplotlib>=3.7
+seaborn>=0.12
+plotly>=5.18
+kaleido>=0.2.1
+geopandas>=0.13
+folium>=0.14

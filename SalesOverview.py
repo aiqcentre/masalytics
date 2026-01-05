@@ -10,11 +10,10 @@ This script:
 4. Compares weekday performance
 """
 
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
-import sys
-from pathlib import Path
+import pandas as pd
+
+from project_paths import OUTPUTS_SALESOVERVIEW, ensure_dir
 
 # ============================================================================
 # Load preprocessed data from DataExplorationMain
@@ -23,6 +22,8 @@ from pathlib import Path
 print("\n" + "="*80)
 print("SALES OVERVIEW ANALYSIS")
 print("="*80)
+
+OUTPUT_DIR = ensure_dir(OUTPUTS_SALESOVERVIEW)
 
 # Import from DataExplorationMain
 from DataExplorationMain import sales, film_meta, sales_indian
@@ -72,7 +73,7 @@ plt.xlabel("Total Gross")
 plt.ylabel("Title")
 plt.title("Top 10 Films by Total Gross")
 plt.tight_layout()
-plt.savefig('outputs_salesoverview/top10_films.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "top10_films.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 print("\nSaved: outputs_salesoverview/top10_films.png")
@@ -111,7 +112,7 @@ plt.ylabel("Total Gross")
 plt.title("Monthly Box Office (Total Gross)")
 plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
-plt.savefig('outputs_salesoverview/monthly_trends.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "monthly_trends.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 print("\nSaved: outputs_salesoverview/monthly_trends.png")
@@ -150,7 +151,7 @@ plt.ylabel("Daily Gross")
 plt.title(f"Daily Box Office Trend: {target_title}")
 plt.xticks(rotation=45, ha='right')
 plt.tight_layout()
-plt.savefig('outputs_salesoverview/top_film_daily_trend.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "top_film_daily_trend.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 print("\nSaved: outputs_salesoverview/top_film_daily_trend.png")
@@ -182,7 +183,7 @@ plt.xlabel("Weekday")
 plt.ylabel("Total Gross")
 plt.title("Total Box Office by Weekday")
 plt.tight_layout()
-plt.savefig('outputs_salesoverview/weekday_performance.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "weekday_performance.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 print("\nSaved: outputs_salesoverview/weekday_performance.png")

@@ -33,13 +33,17 @@ The goal: **protect screening slots, optimise release dates, and refine marketin
 
 ## 🔧 Outputs
 
-| Deliverable                | Description                                                             |
-| -------------------------- | ----------------------------------------------------------------------- |
-| `2025_indian_titles.csv`   | List of Indian releases in Australia (Hindi / Telugu / Tamil / Kannada) |
-| `sales_analysis.ipynb`     | Box-office trends, per-title + per-location                             |
-| `timing_competition.ipynb` | Release calendar + overlap with Film Viet titles                        |
-| `distributor_map.csv`      | Who releases Indian films & where they dominate                         |
-| `masalytics_report.pdf`    | Exec-ready summary for internal planning                                |
+| Deliverable                             | Description                                                             |
+| --------------------------------------- | ----------------------------------------------------------------------- |
+| `DataExplorationMain.py`                | Core ETL module — loads DB, flattens JSON, exports common variables     |
+| `SalesOverview.py`                      | Box-office trends, top films, monthly/daily analysis                    |
+| `LocationQuestions.py`                  | Q1/Q2/Q3 location stability & timing analysis                           |
+| `TitlesDistributors.py`                 | Distributor market share, treemaps, Pareto charts                       |
+| `extract_market_totals.py`              | Q2 market value breakdown by timing type                                |
+| `Q2_Mapping_Step_by_Step.ipynb`         | Interactive SA4 geographic mapping notebook                             |
+| `outputs_salesoverview/`                | Top 10 films, monthly trends visualizations                             |
+| `outputs_locationquestions/`            | Q2 cinema/city summaries, SA4 timing maps                               |
+| `outputs_titlesdistributors/`           | Distributor treemap, Pareto chart, state heatmap                        |
 
 ---
 

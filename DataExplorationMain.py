@@ -2,18 +2,17 @@
 # This module contains data preprocessing and loading code extracted from DataExplorationMain.ipynb
 # It prepares the sales data and makes it available for downstream analysis
 
-import sqlite3
-import pandas as pd
-import json
 import datetime as dt
-from pathlib import Path
+import json
+import sqlite3
+
+import pandas as pd
+
+from project_paths import DATA_DIR, find_database_path
 
 # Connect to database
-conn = sqlite3.connect('data/numero_data.sqlite')
-cursor = conn.cursor()
-
-# Define tables
-tables = ['film_metadata', 'sales_raw_data', 'indian_titles']
+DB_PATH = find_database_path(DATA_DIR / "numero_data.sqlite")
+conn = sqlite3.connect(DB_PATH)
 
 # ============================================================================
 # HELPER FUNCTIONS
@@ -121,6 +120,7 @@ def norm_title(s: pd.Series) -> pd.Series:
 # ============================================================================
 
 # Load raw data from database
+print(f"Using database: {DB_PATH}")
 print("Loading raw data from database...")
 df_raw = pd.read_sql(
     "SELECT numero_film_id, raw_json FROM sales_raw_data;",
@@ -187,7 +187,6 @@ print(f"Final sales (Indian films only): {sales_indian.shape}")
 print(f"Unique Indian films in sales: {sales_indian['numero_film_id'].nunique()}")
 
 # Export main variables (used by downstream scripts)
-# Note: LocationQuestions.py will import these via 'from DataExplorationMain import *'
 print("\nData preprocessing complete. Variables available:")
 print("  - sales: All films sales data")
 print("  - sales_indian: Indian films only")

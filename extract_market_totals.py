@@ -1,25 +1,40 @@
 #!/usr/bin/env python
-"""Extract total market values by timing type for Q2 analysis"""
+"""Extract total market values by timing type for Q2 analysis."""
 
-import sys
-sys.path.insert(0, '.')
-
-from DataExplorationMain import *
-import pandas as pd
 import numpy as np
+import pandas as pd
+
+from DataExplorationMain import film_meta, indian_titles, sales
 
 # Replicate LocationQuestions.py preprocessing
-sales_wt = sales.merge(
+# First, aggregate daily gross_today to weekly_gross
+sales_copy = sales.copy()
+sales_copy['week_start'] = (
+    sales_copy['actual_sales_date']
+      .dt.to_period('W')
+      .apply(lambda r: r.start_time)
+)
+
+# Aggregate to weekly by location
+sales_weekly = (
+    sales_copy
+      .groupby(['numero_film_id', 'state', 'city', 'theatre_name', 'week_start'], as_index=False)['gross_today']
+      .sum()
+      .rename(columns={'gross_today': 'weekly_gross'})
+)
+
+sales_wt = sales_weekly.merge(
     film_meta[["numero_film_id", "title"]],
     on="numero_film_id",
     how="left"
 )
 
 sales_wt["title"] = sales_wt["title"].astype(str).str.strip()
-indian_titles["title"] = indian_titles["title"].astype(str).str.strip()
+indian_titles_copy = indian_titles.copy()
+indian_titles_copy["title"] = indian_titles_copy["title"].astype(str).str.strip()
 
 indian_only = sales_wt.merge(
-    indian_titles[["title"]].drop_duplicates(),
+    indian_titles_copy[["title"]].drop_duplicates(),
     on="title",
     how="inner"
 )
@@ -141,6 +156,6 @@ for _, row in timing_breakdown.iterrows():
     total = row['sum']
     pct = 100 * total / total_market
     count = int(row['count'])
-    print(f'  {timing_type:<18}: ${total:>14,.0f} ({pct:>5.1f}%)  — {count} cities')
+    print(f'  {timing_type:<18}: ${total:>14,.0f} ({pct:>5.1f}%)  - {count} cities')
 
-print(f'\n  TOTAL:              ${total_market:>14,.0f} (100.0%)  — {len(city_plot)} cities')
+print(f'\n  TOTAL:              ${total_market:>14,.0f} (100.0%)  - {len(city_plot)} cities')

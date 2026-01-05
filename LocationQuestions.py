@@ -2,15 +2,19 @@
 # This script performs location-based analysis for film box office performance
 # It imports all preprocessed data and variables from DataExplorationMain
 
-from DataExplorationMain import *
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import plotly.graph_objects as go
-import sqlite3
 import json
-from pathlib import Path
+import sqlite3
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import plotly.graph_objects as go
+import seaborn as sns
+
+from DataExplorationMain import film_meta, indian_titles, sales, sales_indian
+from project_paths import DATA_DIR, OUTPUTS_LOCATION_QUESTIONS, ensure_dir, find_database_path
+
+OUTPUT_DIR = ensure_dir(OUTPUTS_LOCATION_QUESTIONS)
 
 # ============================================================================
 # QUESTION 1: Steady vs Inconsistent Box Office
@@ -247,7 +251,7 @@ plt.title("Key Cinemas: Stability vs Volatility (Log scale improves readability)
 plt.legend()
 plt.grid(True, alpha=0.3, which='both')
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q1_cinemas_scatter.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q1_cinemas_scatter.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: cities scatter plot
@@ -278,7 +282,7 @@ plt.title("Key Cities: Stability vs Volatility (Filtered, MIN_WEEKS applied)")
 plt.legend()
 plt.grid(True, alpha=0.3, which='both')
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q1_cities_scatter.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q1_cities_scatter.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: safer cinemas bar chart
@@ -297,7 +301,7 @@ plt.barh(safer_cinemas_ranked_plot['label'], safer_cinemas_ranked_plot['risk_adj
 plt.xlabel("Risk-adjusted score (mean / (1 + CV))")
 plt.title("Top 10 Safer Cinemas (Ranked)")
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q1_safer_cinemas_barh.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q1_safer_cinemas_barh.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: higher-risk cinemas bar chart
@@ -316,7 +320,7 @@ plt.barh(risk_cinemas_ranked_plot['label'], risk_cinemas_ranked_plot['mean_weekl
 plt.xlabel("Average weekly gross ($)")
 plt.title("Top 10 Higher-risk Cinemas (Ranked by Upside)")
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q1_higher_risk_cinemas_barh.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q1_higher_risk_cinemas_barh.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: safer cities bar chart
@@ -335,7 +339,7 @@ plt.barh(safer_cities_ranked_plot['label'], safer_cities_ranked_plot['risk_adjus
 plt.xlabel("Risk-adjusted score (mean / (1 + CV))")
 plt.title("Top 10 Safer Cities (Ranked)")
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q1_safer_cities_barh.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q1_safer_cities_barh.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: higher-risk cities bar chart
@@ -354,7 +358,7 @@ plt.barh(risk_cities_ranked_plot['label'], risk_cities_ranked_plot['mean_weekly_
 plt.xlabel("Average weekly gross ($)")
 plt.title("Top 10 Higher-risk Cities (Ranked by Upside)")
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q1_higher_risk_cities_barh.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q1_higher_risk_cities_barh.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: volatility heatmap for top cinemas
@@ -404,7 +408,7 @@ plt.xlabel("Week start")
 plt.ylabel("Cinema")
 
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q1_volatility_heatmap.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q1_volatility_heatmap.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 print("\nQ1 visualizations saved to outputs/:")
@@ -427,15 +431,7 @@ print("QUESTION 2: Early Adopter vs Slow Burn")
 print("="*80)
 
 # Find & connect to database
-candidates = (
-    list(Path("data").glob("*.db")) +
-    list(Path(".").glob("*.db")) +
-    list(Path("data").glob("*.sqlite")) +
-    list(Path(".").glob("*.sqlite"))
-)
-assert len(candidates) > 0, "No .db/.sqlite file found in ./ or ./data"
-
-db_path = str(candidates[0])
+db_path = find_database_path(DATA_DIR / "numero_data.sqlite")
 conn = sqlite3.connect(db_path)
 print(f"\nDB: {db_path}")
 
@@ -830,7 +826,7 @@ plt.axhline(gross_line, linestyle=":")
 
 plt.yscale("log")
 plt.title("Timing Map (Cities): Early-adopter vs Slow-burn demand for Indian titles (classification thresholds)")
-plt.xlabel("Early Share (Week 1–2 / Total Gross)")
+plt.xlabel("Early Share (Week 1-2 / Total Gross)")
 plt.ylabel("Total Gross (log scale)")
 plt.legend(loc="upper right")
 plt.grid(True, alpha=0.25)
@@ -846,7 +842,7 @@ for _, r in city_plot.iterrows():
     )
 
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q2_cities_timing_map.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q2_cities_timing_map.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: Cinema timing map (bubble chart)
@@ -873,7 +869,7 @@ plt.axhline(gross_line, linestyle=":")
 
 plt.yscale("log")
 plt.title("Timing Map (Cinemas): Release first vs second wave (classification thresholds)")
-plt.xlabel("Early Share (Week 1–2 / Total Gross)")
+plt.xlabel("Early Share (Week 1-2 / Total Gross)")
 plt.ylabel("Total Gross (log scale)")
 plt.legend(loc="upper right")
 plt.grid(True, alpha=0.25)
@@ -897,7 +893,7 @@ for timing_type in ['EARLY_ADOPTER', 'BALANCED', 'SLOW_BURN']:
         )
 
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q2_cinemas_timing_map.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q2_cinemas_timing_map.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: Cinema speed distribution (stacked bar chart)
@@ -936,7 +932,7 @@ plt.xlabel("Timing class")
 plt.title("Cinemas: Distribution of weeks_to_95 by timing class (counts)")
 plt.legend(title="weeks_to_95", bbox_to_anchor=(1.02, 1), loc="upper left")
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q2_cinemas_speed_distribution.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q2_cinemas_speed_distribution.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: City speed distribution (stacked bar chart)
@@ -966,7 +962,7 @@ for i, t in enumerate(totals):
 ax.legend(title="weeks_to_95", bbox_to_anchor=(1.02, 1), loc="upper left")
 plt.xticks(rotation=0)
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q2_cities_speed_distribution.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q2_cities_speed_distribution.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # Create visualization: Revenue comparison by timing type (Cities)
@@ -1009,11 +1005,11 @@ fig.update_layout(
     template='plotly_white'
 )
 
-fig.write_html('outputs_locationquestions/q2_cities_revenue_boxplot_interactive.html')
+fig.write_html(OUTPUT_DIR / "q2_cities_revenue_boxplot_interactive.html")
 print("Saved: outputs_locationquestions/q2_cities_revenue_boxplot_interactive.html")
 
 # Also save as static PNG for reports
-fig.write_image('outputs_locationquestions/q2_cities_revenue_boxplot.png', width=1000, height=600)
+fig.write_image(OUTPUT_DIR / "q2_cities_revenue_boxplot.png", width=1000, height=600)
 print("Saved: outputs_locationquestions/q2_cities_revenue_boxplot.png")
 
 # Print revenue statistics by timing type
@@ -1066,11 +1062,11 @@ fig.update_layout(
     template='plotly_white'
 )
 
-fig.write_html('outputs_locationquestions/q2_cinemas_revenue_boxplot_interactive.html')
+fig.write_html(OUTPUT_DIR / "q2_cinemas_revenue_boxplot_interactive.html")
 print("\nSaved: outputs_locationquestions/q2_cinemas_revenue_boxplot_interactive.html")
 
 # Also save as static PNG for reports
-fig.write_image('outputs_locationquestions/q2_cinemas_revenue_boxplot.png', width=1000, height=600)
+fig.write_image(OUTPUT_DIR / "q2_cinemas_revenue_boxplot.png", width=1000, height=600)
 print("Saved: outputs_locationquestions/q2_cinemas_revenue_boxplot.png")
 
 # Print revenue statistics by timing type
@@ -1170,24 +1166,24 @@ fig, axes = plt.subplots(3, 1, figsize=(16, 12))
 
 # Heatmap 1: Z-scored seasonality
 sns.heatmap(state_pivot_z, cmap='RdBu_r', center=0, ax=axes[0], cbar_kws={'label': 'z-score'})
-axes[0].set_title('State × ISO Week: Z-scored Seasonality (Red=Busy, Blue=Quiet)')
+axes[0].set_title('State x ISO Week: Z-scored Seasonality (Red=Busy, Blue=Quiet)')
 axes[0].set_xlabel('ISO Week')
 axes[0].set_ylabel('State')
 
 # Heatmap 2: Avg titles (competition)
 sns.heatmap(state_pivot_titles, cmap='YlOrRd', ax=axes[1], cbar_kws={'label': 'Avg # Titles'})
-axes[1].set_title('State × ISO Week: Average # Active Indian Titles (Competition proxy)')
+axes[1].set_title('State x ISO Week: Average # Active Indian Titles (Competition proxy)')
 axes[1].set_xlabel('ISO Week')
 axes[1].set_ylabel('State')
 
 # Heatmap 3: Avg cinemas
 sns.heatmap(state_pivot_cinemas, cmap='YlGn', ax=axes[2], cbar_kws={'label': 'Avg # Cinemas'})
-axes[2].set_title('State × ISO Week: Average # Cinemas Screening Indian Titles')
+axes[2].set_title('State x ISO Week: Average # Cinemas Screening Indian Titles')
 axes[2].set_xlabel('ISO Week')
 axes[2].set_ylabel('State')
 
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q3_state_seasonality_heatmaps.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q3_state_seasonality_heatmaps.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # Find peak and trough weeks per state
@@ -1217,7 +1213,7 @@ plt.title('State Seasonality Index by ISO Week (Top 4 States)')
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q3_state_seasonality_lines.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q3_state_seasonality_lines.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # City-level seasonality
@@ -1281,11 +1277,11 @@ city_pivot_idx.index = [f"{c[0][:10]} | {c[1][:15]}" for c in city_pivot_idx.ind
 
 plt.figure(figsize=(16, 8))
 sns.heatmap(city_pivot_idx, cmap='RdBu_r', center=1, cbar_kws={'label': 'Seasonality Index'}, vmin=0.5, vmax=1.5)
-plt.title('Key Cities × ISO Week: Seasonality Index (Red=Over-index, Blue=Under-index)')
+plt.title('Key Cities x ISO Week: Seasonality Index (Red=Over-index, Blue=Under-index)')
 plt.xlabel('ISO Week')
 plt.ylabel('City')
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q3_city_seasonality_heatmap.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q3_city_seasonality_heatmap.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 # Bump chart: city ranks by week
@@ -1306,7 +1302,7 @@ plt.title('Key Cities: Revenue Trend by ISO Week (Bumps Show Seasonal Variation)
 plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize=9)
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.savefig('outputs_locationquestions/q3_city_revenue_trends.png', dpi=100, bbox_inches='tight')
+plt.savefig(OUTPUT_DIR / "q3_city_revenue_trends.png", dpi=100, bbox_inches='tight')
 plt.close()
 
 print("\nQ3 visualizations saved to outputs/:")

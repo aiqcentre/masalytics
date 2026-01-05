@@ -10,13 +10,12 @@ This script:
 4. Creates visualizations: treemap, Pareto chart, and state heatmap
 """
 
-import pandas as pd
-import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import sqlite3
-from pathlib import Path
+import pandas as pd
+
+from project_paths import OUTPUTS_TITLES_DISTRIBUTORS, ensure_dir
 
 # ============================================================================
 # Load preprocessed data from DataExplorationMain
@@ -25,6 +24,8 @@ from pathlib import Path
 print("\n" + "="*80)
 print("TITLES & DISTRIBUTORS ANALYSIS")
 print("="*80)
+
+OUTPUT_DIR = ensure_dir(OUTPUTS_TITLES_DISTRIBUTORS)
 
 from DataExplorationMain import sales, film_meta, conn
 
@@ -113,8 +114,8 @@ fig = px.treemap(
     title='Distributor Share of Total Gross (Top 15)'
 )
 
-fig.write_html('outputs_titlesdistributors/distributor_treemap.html')
-fig.write_image('outputs_titlesdistributors/distributor_treemap.png', width=1000, height=700)
+fig.write_html(OUTPUT_DIR / "distributor_treemap.html")
+fig.write_image(OUTPUT_DIR / "distributor_treemap.png", width=1000, height=700)
 
 print("Saved: outputs_titlesdistributors/distributor_treemap.html")
 print("Saved: outputs_titlesdistributors/distributor_treemap.png")
@@ -159,8 +160,8 @@ fig.update_layout(
 fig.update_yaxes(title_text="Cumulative Share", secondary_y=True, tickformat=".0%")
 fig.update_xaxes(tickangle=45)
 
-fig.write_html('outputs_titlesdistributors/distributor_pareto.html')
-fig.write_image('outputs_titlesdistributors/distributor_pareto.png', width=1200, height=600)
+fig.write_html(OUTPUT_DIR / "distributor_pareto.html")
+fig.write_image(OUTPUT_DIR / "distributor_pareto.png", width=1200, height=600)
 
 print("Saved: outputs_titlesdistributors/distributor_pareto.html")
 print("Saved: outputs_titlesdistributors/distributor_pareto.png")
@@ -200,8 +201,8 @@ fig = px.imshow(
     color_continuous_scale='Viridis'
 )
 
-fig.write_html('outputs_titlesdistributors/distributor_state_heatmap.html')
-fig.write_image('outputs_titlesdistributors/distributor_state_heatmap.png', width=1000, height=600)
+fig.write_html(OUTPUT_DIR / "distributor_state_heatmap.html")
+fig.write_image(OUTPUT_DIR / "distributor_state_heatmap.png", width=1000, height=600)
 
 print("Saved: outputs_titlesdistributors/distributor_state_heatmap.html")
 print("Saved: outputs_titlesdistributors/distributor_state_heatmap.png")
