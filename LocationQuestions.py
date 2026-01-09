@@ -453,7 +453,10 @@ def weekly_gross_from_boxoffice(box_office: dict) -> float:
         di = box_office.get(f"day{i}", {})
         if isinstance(di, dict):
             v = di.get("today", 0) or 0
-            total += float(v)
+            try:
+                total += float(v)
+            except (TypeError, ValueError):
+                continue
     return total
 
 # Parse raw JSON and extract weekly sales by location
@@ -461,7 +464,15 @@ rows_out = []
 
 for _, r in sales_raw.iterrows():
     film_id = r["numero_film_id"]
-    j = json.loads(r["raw_json"])
+    raw_json = r.get("raw_json")
+    if not raw_json:
+        continue
+    try:
+        j = json.loads(raw_json)
+    except json.JSONDecodeError:
+        continue
+    if not isinstance(j, dict):
+        continue
 
     for week_start, payload in j.items():
         week_rows = payload.get("rows", []) if isinstance(payload, dict) else []
@@ -896,75 +907,6 @@ plt.tight_layout()
 plt.savefig(OUTPUT_DIR / "q2_cinemas_timing_map.png", dpi=100, bbox_inches='tight')
 plt.close()
 
-# Create visualization: Cinema speed distribution (stacked bar chart)
-cinema_speed_plot_clean = cinema_speed_plot.copy()
-cinema_speed_plot_clean["weeks_to_95"] = pd.to_numeric(cinema_speed_plot_clean["weeks_to_95"], errors="coerce").round()
-cinema_speed_plot_clean["weeks_to_95"] = cinema_speed_plot_clean["weeks_to_95"].astype("Int64")
-cinema_speed_plot_clean = cinema_speed_plot_clean.dropna(subset=["weeks_to_95"]).copy()
-cinema_speed_plot_clean["weeks_to_95"] = cinema_speed_plot_clean["weeks_to_95"].astype(int)
-
-counts = (
-    cinema_speed_plot_clean
-    .groupby(["timing_class", "weeks_to_95"])
-    .size()
-    .unstack(fill_value=0)
-)
-
-class_order = ["SLOW_BURN", "BALANCED", "EARLY_ADOPTER"]
-counts = counts.reindex([c for c in class_order if c in counts.index])
-
-week_cols = sorted(counts.columns.tolist())
-counts = counts[week_cols]
-
-x = np.arange(len(counts.index))
-bottom = np.zeros(len(counts.index))
-
-plt.figure(figsize=(12, 6))
-
-for w in week_cols:
-    vals = counts[w].values
-    plt.bar(x, vals, bottom=bottom, label=str(w))
-    bottom += vals
-
-plt.xticks(x, [f"{c} (n={counts.loc[c].sum()})" for c in counts.index], rotation=0)
-plt.ylabel("Number of cinemas")
-plt.xlabel("Timing class")
-plt.title("Cinemas: Distribution of weeks_to_95 by timing class (counts)")
-plt.legend(title="weeks_to_95", bbox_to_anchor=(1.02, 1), loc="upper left")
-plt.tight_layout()
-plt.savefig(OUTPUT_DIR / "q2_cinemas_speed_distribution.png", dpi=100, bbox_inches='tight')
-plt.close()
-
-# Create visualization: City speed distribution (stacked bar chart)
-counts_city = (
-    city_speed_plot
-    .groupby(["timing_class", "weeks_to_95"])
-    .size()
-    .unstack(fill_value=0)
-)
-
-class_order = ["SLOW_BURN", "BALANCED", "EARLY_ADOPTER"]
-counts_city = counts_city.reindex([c for c in class_order if c in counts_city.index])
-
-weeks_order = sorted(counts_city.columns, key=lambda x: float(x))
-counts_city = counts_city[weeks_order]
-
-ax = counts_city.plot(kind="bar", stacked=True, figsize=(12, 6))
-
-ax.set_title("Cities: Number of cities by weeks_to_95 and timing class")
-ax.set_xlabel("Timing class")
-ax.set_ylabel("Number of cities")
-
-totals = counts_city.sum(axis=1).values
-for i, t in enumerate(totals):
-    ax.text(i, t + 0.2, str(int(t)), ha="center", va="bottom", fontsize=10)
-
-ax.legend(title="weeks_to_95", bbox_to_anchor=(1.02, 1), loc="upper left")
-plt.xticks(rotation=0)
-plt.tight_layout()
-plt.savefig(OUTPUT_DIR / "q2_cities_speed_distribution.png", dpi=100, bbox_inches='tight')
-plt.close()
-
 # Create visualization: Revenue comparison by timing type (Cities)
 # Merge timing classification with city-level aggregated revenue data
 city_timing_revenue = city_summary.merge(
@@ -1088,8 +1030,6 @@ for timing_type in ['EARLY_ADOPTER', 'BALANCED', 'SLOW_BURN']:
 print("\nQ2 visualizations saved to outputs/:")
 print("  - q2_cities_timing_map.png")
 print("  - q2_cinemas_timing_map.png")
-print("  - q2_cinemas_speed_distribution.png")
-print("  - q2_cities_speed_distribution.png")
 print("  - q2_cities_revenue_boxplot.png")
 print("  - q2_cinemas_revenue_boxplot.png")
 

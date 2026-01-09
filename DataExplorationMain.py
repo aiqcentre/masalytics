@@ -33,7 +33,43 @@ def flatten_one_film(raw_json_str, film_id):
     """
     rows_out = []
 
-    data = json.loads(raw_json_str)
+    if not raw_json_str:
+        return pd.DataFrame(
+            columns=[
+                "numero_film_id",
+                "actual_sales_date",
+                "state",
+                "city",
+                "theatre_name",
+                "gross_today",
+            ]
+        )
+
+    try:
+        data = json.loads(raw_json_str)
+    except json.JSONDecodeError:
+        return pd.DataFrame(
+            columns=[
+                "numero_film_id",
+                "actual_sales_date",
+                "state",
+                "city",
+                "theatre_name",
+                "gross_today",
+            ]
+        )
+
+    if not isinstance(data, dict):
+        return pd.DataFrame(
+            columns=[
+                "numero_film_id",
+                "actual_sales_date",
+                "state",
+                "city",
+                "theatre_name",
+                "gross_today",
+            ]
+        )
 
     for week_start_str, week_content in data.items():
         try:
@@ -91,10 +127,12 @@ def flatten_sales_json(df_raw: pd.DataFrame) -> pd.DataFrame:
     all_frames = []
 
     for _, row in df_raw.iterrows():
-        film_id = int(row['numero_film_id'])
-        raw = row['raw_json']
+        try:
+            film_id = int(row['numero_film_id'])
+        except (TypeError, ValueError):
+            continue
 
-        df_one = flatten_one_film(raw, film_id)
+        df_one = flatten_one_film(row.get('raw_json'), film_id)
 
         if not df_one.empty:
             all_frames.append(df_one)
