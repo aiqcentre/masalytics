@@ -34,6 +34,7 @@ AUSTRALIA_BORDER_WIDTH = 1.2
 AUSTRALIA_SIMPLIFY_TOLERANCE = 0.05
 CITY_PEAK_QUANTILE = 0.9
 CITY_LOW_QUANTILE = 0.1
+WRITE_CITY_YEAR_SELECTOR = False
 
 COLOR_SCALES = {
     "RdBu_r": px.colors.diverging.RdBu[::-1],
@@ -903,21 +904,18 @@ def main() -> None:
             "title": "Q3 State Seasonality (Z-score) by ISO Week",
             "scale": "RdBu_r",
             "midpoint": 0.0,
-            "output": OUTPUT_DIR / "q3_state_seasonality_gross_z_map.html",
         },
         {
             "metric": "avg_titles",
             "title": "Q3 State Average Titles by ISO Week",
             "scale": "YlOrRd",
             "midpoint": None,
-            "output": OUTPUT_DIR / "q3_state_seasonality_avg_titles_map.html",
         },
         {
             "metric": "avg_cinemas",
             "title": "Q3 State Average Cinemas by ISO Week",
             "scale": "YlGn",
             "midpoint": None,
-            "output": OUTPUT_DIR / "q3_state_seasonality_avg_cinemas_map.html",
         },
     ]
 
@@ -931,7 +929,7 @@ def main() -> None:
             metric=spec["metric"],
             title=spec["title"],
             color_scale=spec["scale"],
-            output_path=spec["output"],
+            output_path=None,
             midpoint=spec["midpoint"],
             label_points=state_labels,
         )
@@ -940,7 +938,7 @@ def main() -> None:
     write_selector_html(
         figures=state_figures,
         output_path=OUTPUT_DIR / "q3_state_seasonality_selector.html",
-        options=["gross_z", "avg_titles", "avg_cinemas"],
+        options=[spec["metric"] for spec in state_maps],
         label_map=METRIC_LABELS,
         descriptions=METRIC_DESCRIPTIONS,
         title="Q3 State Seasonality Maps",
@@ -975,60 +973,6 @@ def main() -> None:
     city_peak_df.loc[
         city_peak_df["seasonality_idx"] <= low_threshold, "peak_low_score"
     ] = -1.0
-
-    seasonality_fig = build_animation(
-        city_df,
-        city_geojson,
-        location_col="city",
-        feature_key="properties.city",
-        metric="seasonality_idx",
-        title=(
-            "Q3 City Seasonality Index by ISO Week "
-            f"(Top {len(top_cities)} labels)"
-        ),
-        color_scale="RdBu_r",
-        output_path=None,
-        midpoint=1.0,
-        label_points=city_labels,
-        label_names=top_cities,
-        label_font_size=9,
-        label_textposition="top center",
-        range_percentiles=(5, 95),
-        border_geojson=australia_outline,
-        write_html=False,
-    )
-
-    peak_low_fig = build_animation(
-        city_peak_df,
-        city_geojson,
-        location_col="city",
-        feature_key="properties.city",
-        metric="peak_low_score",
-        title=(
-            "Q3 City Peak/Low Weeks by ISO Week "
-            f"(Top {len(top_cities)} labels)"
-        ),
-        color_scale="RdBu_r",
-        output_path=None,
-        midpoint=0.0,
-        label_points=city_labels,
-        label_names=top_cities,
-        label_font_size=9,
-        label_textposition="top center",
-        range_percentiles=None,
-        border_geojson=australia_outline,
-        write_html=False,
-    )
-
-    write_highlight_html(
-        main_fig=seasonality_fig,
-        highlight_fig=peak_low_fig,
-        output_path=OUTPUT_DIR / "q3_city_seasonality_index_map.html",
-        highlight_heading="HIGHLIGHT",
-        highlight_note=(
-            "Peak/low weeks per city (top 10% = peak, bottom 10% = low)."
-        ),
-    )
 
     city_metric_specs = [
         {
@@ -1066,12 +1010,28 @@ def main() -> None:
             "midpoint": None,
             "range_percentiles": (5, 95),
         },
+        {
+            "metric": "opportunity_score",
+            "title": "Q3 City Opportunity Score by ISO Week",
+            "scale": "RdBu_r",
+            "midpoint": 0.0,
+            "range_percentiles": (5, 95),
+        },
+        {
+            "metric": "peak_low_score",
+            "title": "Q3 City Peak/Low Weeks by ISO Week",
+            "scale": "RdBu_r",
+            "midpoint": 0.0,
+            "range_percentiles": None,
+            "data": city_peak_df,
+        },
     ]
 
     city_figures: dict[str, go.Figure] = {}
     for spec in city_metric_specs:
+        source_df = spec.get("data", city_df)
         fig = build_animation(
-            city_df,
+            source_df,
             city_geojson,
             location_col="city",
             feature_key="properties.city",
@@ -1096,68 +1056,51 @@ def main() -> None:
         options=[spec["metric"] for spec in city_metric_specs],
         label_map=METRIC_LABELS,
         descriptions=METRIC_DESCRIPTIONS,
-        title="Q3 City Seasonality Maps",
+        title="Q3 City Maps",
     )
 
-    build_animation(
-        city_df,
-        city_geojson,
-        location_col="city",
-        feature_key="properties.city",
-        metric="opportunity_score",
-        title="Q3 City Opportunity Score by ISO Week",
-        color_scale="RdBu_r",
-        output_path=OUTPUT_DIR / "q3_city_opportunity_map.html",
-        midpoint=0.0,
-        label_points=city_labels,
-        label_names=top_cities,
-        label_font_size=9,
-        label_textposition="top center",
-        range_percentiles=(5, 95),
-        border_geojson=australia_outline,
-    )
+    if WRITE_CITY_YEAR_SELECTOR:
+        city_year_week = compute_city_week_by_year(sales_for_seasonality)
+        years = sorted(city_year_week["iso_year"].dropna().unique().tolist())
 
-    city_year_week = compute_city_week_by_year(sales_for_seasonality)
-    years = sorted(city_year_week["iso_year"].dropna().unique().tolist())
+        year_figures: dict[str, go.Figure] = {}
+        for year in years:
+            year_df = city_year_week[city_year_week["iso_year"] == year].copy()
+            fig = build_animation(
+                year_df,
+                city_geojson,
+                location_col="city",
+                feature_key="properties.city",
+                metric="seasonality_idx",
+                title=f"Q3 City Seasonality Index by ISO Week ({year})",
+                color_scale="RdBu_r",
+                output_path=None,
+                midpoint=1.0,
+                label_points=city_labels,
+                label_names=top_cities,
+                label_font_size=9,
+                label_textposition="top center",
+                range_percentiles=(5, 95),
+                border_geojson=australia_outline,
+                write_html=False,
+            )
+            year_figures[str(year)] = fig
 
-    year_figures: dict[str, go.Figure] = {}
-    for year in years:
-        year_df = city_year_week[city_year_week["iso_year"] == year].copy()
-        fig = build_animation(
-            year_df,
-            city_geojson,
-            location_col="city",
-            feature_key="properties.city",
-            metric="seasonality_idx",
-            title=f"Q3 City Seasonality Index by ISO Week ({year})",
-            color_scale="RdBu_r",
-            output_path=None,
-            midpoint=1.0,
-            label_points=city_labels,
-            label_names=top_cities,
-            label_font_size=9,
-            label_textposition="top center",
-            range_percentiles=(5, 95),
-            border_geojson=australia_outline,
-            write_html=False,
+        year_labels = {str(year): f"ISO Year {year}" for year in years}
+        year_descriptions = {
+            str(year): "Seasonality index within the selected year."
+            for year in years
+        }
+
+        write_selector_html(
+            figures=year_figures,
+            output_path=OUTPUT_DIR / "q3_city_seasonality_year_selector.html",
+            options=[str(year) for year in years],
+            label_map=year_labels,
+            descriptions=year_descriptions,
+            title="Q3 City Seasonality by Year",
+            select_label="Year",
         )
-        year_figures[str(year)] = fig
-
-    year_labels = {str(year): f"ISO Year {year}" for year in years}
-    year_descriptions = {
-        str(year): "Seasonality index within the selected year."
-        for year in years
-    }
-
-    write_selector_html(
-        figures=year_figures,
-        output_path=OUTPUT_DIR / "q3_city_seasonality_year_selector.html",
-        options=[str(year) for year in years],
-        label_map=year_labels,
-        descriptions=year_descriptions,
-        title="Q3 City Seasonality by Year",
-        select_label="Year",
-    )
 
 
 if __name__ == "__main__":
